@@ -1,6 +1,10 @@
 "use client";
 import { useState } from "react";
 
+const ANIMALS = [];
+
+const genrateUsername = () => {};
+
 export default function Home() {
   const [username, setUsername] = useState("");
 
