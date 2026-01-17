@@ -1,7 +1,7 @@
 "use client";
 
 import { useParams } from "next/navigation";
-import { useState } from "react";
+import { useRef, useState } from "react";
 
 function formatTimeReaning(seconds: number) {
   const mins = Math.floor(seconds / 60);
@@ -13,6 +13,8 @@ const Page = () => {
   const params = useParams();
   const roomId = params.roomId as string;
 
+  const [input, setInput] = useState("");
+  const inputRef = useRef<HTMLInputElement>(null);
   const [copyStatus, setCopyStatus] = useState("COPY");
   const [timeRemainig, setTimeRemainig] = useState<number | null>(null);
 
@@ -62,6 +64,33 @@ const Page = () => {
           DESTROY NOW
         </button>
       </header>
+      <div className="flex-1 overflow-y-auto p-4 space-y-4 scrollbar-thin"></div>
+      <div className="p-4 border-t border-zinc-800 bg-zinc-900/30">
+        <div className="flex gap-4">
+          <div className="flex-1 relative group">
+            <span className="absolute left-4 top-1/2 -translate-y-1/2 text-green-500 animate-pulse">
+              {">"}
+            </span>
+            <input
+              value={input}
+              onChange={(e) => setInput(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === "Enter" && input.trim()) {
+                  // TODO: SEND MESSAGE
+                  inputRef.current?.focus();
+                }
+              }}
+              autoFocus
+              placeholder="Type message..."
+              type="text"
+              className="w-full bg-black border border-zinc-800 focus:border-zinc-600 focus:outline-none transition-colors text-zinc-100 place-holder:text-zinc-700 py-3 pl-8 pr-4 text-sm"
+            />
+          </div>
+          <button className="bg-zinc-800 text-zinc-400 px-6 font-bold hover:text-zinc-200 transition-all disabled:opicacity-50 disabled:cursor-not-allow cursor-pionter">
+            SEND
+          </button>
+        </div>
+      </div>
     </main>
   );
 };
