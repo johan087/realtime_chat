@@ -40,7 +40,7 @@ const messages = new Elysia({ prefix: "/messages" }).use(authMiddleware).post(
       roomId,
     };
 
-    await redis.rpush(`message:${roomId}`, { ...message, token: auth.token });
+    await redis.rpush(`messages:${roomId}`, { ...message, token: auth.token });
 
     await realtime.channel(roomId).emit("chat.message", message);
 
