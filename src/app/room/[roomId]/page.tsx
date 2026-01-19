@@ -1,8 +1,10 @@
 "use client";
 
 import { client } from "@/app/lib/client";
+import { useRealtime } from "@/app/lib/realtime-client";
 import { useUsername } from "@/hooks/use-username";
 import { useMutation, useQuery } from "@tanstack/react-query";
+import { format } from "date-fns";
 import { useParams } from "next/navigation";
 import { useRef, useState } from "react";
 
@@ -22,7 +24,7 @@ const Page = () => {
   const [copyStatus, setCopyStatus] = useState("COPY");
   const [timeRemainig, setTimeRemainig] = useState<number | null>(141);
 
-  const { data: messages } = useQuery({
+  const { data: messages, refetch } = useQuery({
     queryKey: ["messages, roomId"],
     queryFn: async () => {
       const res = await client.messages.get({
@@ -44,6 +46,16 @@ const Page = () => {
     },
   });
 
+  useRealtime({
+    channels: [roomId],
+    events: ["chat.message", "chat.destroy"],
+    onData: ({ event }) => {
+      if (event === "chat.message") {
+        refetch();
+      }
+    },
+  });
+
   const copyLink = () => {
     const url = window.location.href;
     navigator.clipboard.writeText(url);
@@ -52,7 +64,7 @@ const Page = () => {
   };
 
   return (
-    <main className="flex flex-col h-screen max-h-screen overflow-hidden ">
+    <main className="flex flex-col h-screen max-h-screen overflow-hidden bg-black">
       <header className="border-b bg-black border-zinc-800 p-4 flex items-center justify-between ">
         <div className="flex items-center gap-4">
           <div className="flex flex-col">
@@ -92,13 +104,32 @@ const Page = () => {
       </header>
 
       <div className="flex-1 overflow-y-auto p-4 space-y-4 scrollbar-thin">
-        {(messages?.messages.length === 0 || messages?.messages.length) && (
+        {messages?.messages.length === 0 && (
           <div className="flex items-center justify center h-full">
             <p className="text-zinc-600 text-sm font-mono">
               No messages yet, start the conversation.
             </p>
           </div>
         )}
+        {messages?.messages.map((msg) => (
+          <div key={msg.id} className="flex flex-col items-start">
+            <div className="max-w-[80%] group">
+              <div className="flex items-center gap-3 mb-1">
+                <span
+                  className={`text-xs font-bold ${msg.sender === username ? "text-green-500" : "text-blue-500"}`}
+                >
+                  {msg.sender === username ? "YOU" : msg.sender}
+                </span>
+                <span className="text-[10px] text-zinc-600 ">
+                  {format(msg.timestamp, "HH:mm")}
+                </span>
+              </div>
+              <p className="text-sm text-zinc-300 leading-relaxed break-all">
+                {msg.text}
+              </p>
+            </div>
+          </div>
+        ))}
       </div>
 
       <div className="p-4 border-t border-zinc-800 bg-zinc-900/30">

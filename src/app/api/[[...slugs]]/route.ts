@@ -65,14 +65,11 @@ const messages = new Elysia({ prefix: "/messages" })
   .get(
     "/",
     async ({ auth }) => {
-      console.log("auth: ", auth);
-
       const messages = await redis.lrange<Message>(
         `messages:${auth.roomId}`,
         0,
         -1,
       );
-      console.log("messages: ", messages);
 
       return {
         messages: messages.map((m) => ({
