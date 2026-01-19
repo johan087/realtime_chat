@@ -2,7 +2,7 @@
 
 import { client } from "@/app/lib/client";
 import { useUsername } from "@/hooks/use-username";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import { useParams } from "next/navigation";
 import { useRef, useState } from "react";
 
@@ -21,6 +21,16 @@ const Page = () => {
   const inputRef = useRef<HTMLInputElement>(null);
   const [copyStatus, setCopyStatus] = useState("COPY");
   const [timeRemainig, setTimeRemainig] = useState<number | null>(141);
+
+  const { data: messages } = useQuery({
+    queryKey: ["messages, roomId"],
+    queryFn: async () => {
+      const res = await client.messages.get({
+        query: { roomId },
+      });
+      return res.data;
+    },
+  });
 
   const { mutate: sendMessage, isPending } = useMutation({
     mutationFn: async ({ text }: { text: string }) => {
@@ -80,7 +90,17 @@ const Page = () => {
           DESTROY NOW
         </button>
       </header>
-      <div className="flex-1 overflow-y-auto p-4 space-y-4 scrollbar-thin"></div>
+
+      <div className="flex-1 overflow-y-auto p-4 space-y-4 scrollbar-thin">
+        {(messages?.messages.length === 0 || messages?.messages.length) && (
+          <div className="flex items-center justify center h-full">
+            <p className="text-zinc-600 text-sm font-mono">
+              No messages yet, start the conversation.
+            </p>
+          </div>
+        )}
+      </div>
+
       <div className="p-4 border-t border-zinc-800 bg-zinc-900/30">
         <div className="flex gap-4">
           <div className="flex-1 relative group">
