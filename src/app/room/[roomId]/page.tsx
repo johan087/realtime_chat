@@ -1,5 +1,7 @@
 "use client";
 
+import { client } from "@/app/lib/client";
+import { useMutation } from "@tanstack/react-query";
 import { useParams } from "next/navigation";
 import { useRef, useState } from "react";
 
@@ -16,7 +18,19 @@ const Page = () => {
   const [input, setInput] = useState("");
   const inputRef = useRef<HTMLInputElement>(null);
   const [copyStatus, setCopyStatus] = useState("COPY");
-  const [timeRemainig, setTimeRemainig] = useState<number | null>(null);
+  const [timeRemainig, setTimeRemainig] = useState<number | null>(141);
+
+  const {} = useMutation({
+    mutationFn: async ({ text }: { text: string }) => {
+      await client.messages.post(
+        {
+          sender: username,
+          text,
+        },
+        { query: { roomId } },
+      );
+    },
+  });
 
   const copyLink = () => {
     const url = window.location.href;
@@ -76,7 +90,6 @@ const Page = () => {
               onChange={(e) => setInput(e.target.value)}
               onKeyDown={(e) => {
                 if (e.key === "Enter" && input.trim()) {
-                  // TODO: SEND MESSAGE
                   inputRef.current?.focus();
                 }
               }}
