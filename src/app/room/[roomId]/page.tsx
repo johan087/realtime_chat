@@ -5,7 +5,7 @@ import { useRealtime } from "@/app/lib/realtime-client";
 import { useUsername } from "@/hooks/use-username";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { format } from "date-fns";
-import { useParams } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import { useRef, useState } from "react";
 
 function formatTimeReaning(seconds: number) {
@@ -18,6 +18,7 @@ const Page = () => {
   const params = useParams();
   const roomId = params.roomId as string;
 
+  const router = useRouter();
   const { username } = useUsername();
   const [input, setInput] = useState("");
   const inputRef = useRef<HTMLInputElement>(null);
@@ -43,6 +44,7 @@ const Page = () => {
         },
         { query: { roomId } },
       );
+      setInput("");
     },
   });
 
@@ -52,6 +54,9 @@ const Page = () => {
     onData: ({ event }) => {
       if (event === "chat.message") {
         refetch();
+      }
+      if (event === "chat.destroy") {
+        router.push("/?destroyed=true");
       }
     },
   });
