@@ -40,6 +40,26 @@ const Page = () => {
     }
   }, [ttlData]);
 
+  useEffect(() => {
+    if (timeRemainig === null || timeRemainig < 0) {
+      return;
+    }
+    if (timeRemainig === 0) {
+      router.push("/?destroyed=true");
+      return;
+    }
+    const interval = setInterval(() => {
+      setTimeRemainig((prev) => {
+        if (prev === null || prev <= 1) {
+          clearInterval(interval);
+          return 0;
+        }
+        return prev - 1;
+      });
+    }, 1000);
+    return () => clearInterval(interval);
+  }, [timeRemainig, router]);
+
   const { data: messages, refetch } = useQuery({
     queryKey: ["messages, roomId"],
     queryFn: async () => {
