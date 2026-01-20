@@ -6,7 +6,7 @@ import { useUsername } from "@/hooks/use-username";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { format } from "date-fns";
 import { useParams, useRouter } from "next/navigation";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 function formatTimeReaning(seconds: number) {
   const mins = Math.floor(seconds / 60);
@@ -23,7 +23,22 @@ const Page = () => {
   const [input, setInput] = useState("");
   const inputRef = useRef<HTMLInputElement>(null);
   const [copyStatus, setCopyStatus] = useState("COPY");
-  const [timeRemainig, setTimeRemainig] = useState<number | null>(141);
+  const [timeRemainig, setTimeRemainig] = useState<number | null>(null);
+
+  const { data: ttlData } = useQuery({
+    queryKey: ["ttl", roomId],
+    queryFn: async () => {
+      const res = await client.room.ttl.get({ query: { roomId } });
+      return res.data;
+    },
+  });
+
+  useEffect(() => {
+    if (ttlData?.ttl !== undefined) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
+      setTimeRemainig(ttlData?.ttl);
+    }
+  }, [ttlData]);
 
   const { data: messages, refetch } = useQuery({
     queryKey: ["messages, roomId"],
