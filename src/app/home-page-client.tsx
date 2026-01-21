@@ -16,7 +16,10 @@ export default function ClientHome({
 
   const { mutate: createRoom } = useMutation({
     mutationFn: async () => {
+      console.log("creating room");
+
       const res = await client.room.create.post({});
+      console.log("created room");
       if (res.status === 200) router.push(`/room/${res.data?.roomId}`);
     },
   });
