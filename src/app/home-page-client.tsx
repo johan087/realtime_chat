@@ -3,19 +3,16 @@ import { useUsername } from "@/hooks/use-username";
 import { useMutation } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 import { client } from "./lib/client";
-import { use } from "react";
 
 export default function ClientHome({
   searchParams,
 }: {
-  searchParams: Promise<{ error?: string }>;
+  searchParams: { error?: string };
 }) {
   const { username } = useUsername();
   const router = useRouter();
-  const params = use(searchParams);
-  //const searchParams = useSearchParams();
-  //const wasDestroyed = params.error === "destroyed";
-  //const error = searchParams.get("error");
+  const params = searchParams;
+  console.log("params: ", params);
 
   const { mutate: createRoom } = useMutation({
     mutationFn: async () => {

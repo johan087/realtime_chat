@@ -15,7 +15,7 @@ const schema = {
   chat: {
     message,
     destroy: z.object({
-      isDstroyed: z.literal(true),
+      isDestroyed: z.literal(true),
     }),
   },
 };

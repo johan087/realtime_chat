@@ -45,7 +45,7 @@ const Page = () => {
       return;
     }
     if (timeRemainig === 0) {
-      router.push("/?destroyed=true");
+      router.push("/?error=destroyed");
       return;
     }
     const interval = setInterval(() => {
@@ -91,8 +91,14 @@ const Page = () => {
         refetch();
       }
       if (event === "chat.destroy") {
-        router.push("/?destroyed=true");
+        router.push("/?error=destroyed");
       }
+    },
+  });
+
+  const { mutate: destroyRoom } = useMutation({
+    mutationFn: async () => {
+      await client.room.delete(null, { query: { roomId } });
     },
   });
 
@@ -137,7 +143,10 @@ const Page = () => {
             </span>
           </div>
         </div>
-        <button className="text-xs bg-zinc-800 hover:bg-red-600 px-3 py-1.5 rounded text-zinc-400 hover:text-white font-bold transition-all group flex items-center  gap-2 disabled:opacity-50">
+        <button
+          onClick={() => destroyRoom()}
+          className="text-xs bg-zinc-800 hover:bg-red-600 px-3 py-1.5 rounded text-zinc-400 hover:text-white font-bold transition-all group flex items-center  gap-2 disabled:opacity-50"
+        >
           <span className="group-hover:animate-pulse">💣</span>
           DESTROY NOW
         </button>
